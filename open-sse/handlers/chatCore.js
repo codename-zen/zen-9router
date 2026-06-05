@@ -288,7 +288,12 @@ export async function handleChatCore({ body, modelInfo, credentials, log, onCred
 
   // Streaming response
   const { onStreamComplete } = buildOnStreamComplete({ ...sharedCtx });
-  return handleStreamingResponse({ ...sharedCtx, providerResponse, sourceFormat, targetFormat, userAgent, reqLogger, toolNameMap, streamController, onStreamComplete });
+  return handleStreamingResponse({
+    ...sharedCtx,
+    providerResponse, sourceFormat, targetFormat, userAgent,
+    reqLogger, toolNameMap, streamController, onStreamComplete,
+    retryContext: { executor, credentials, log, proxyOptions },
+  });
 }
 
 export function isTokenExpiringSoon(expiresAt, bufferMs = 5 * 60 * 1000) {
