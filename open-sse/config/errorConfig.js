@@ -45,6 +45,7 @@ export const MAX_RATE_LIMIT_COOLDOWN_MS = 30 * 60 * 1000;
 const COOLDOWN = {
   long: 2 * 60 * 1000,
   short: 5 * 1000,
+  instant: 1 * 1000,     // instant retry for stream/network drops
 };
 
 /**
@@ -57,6 +58,17 @@ const COOLDOWN = {
  *   - backoff: true = use exponential backoff (rate limit)
  */
 export const ERROR_RULES = [
+  // --- DeepSeek / CommandCode mid-stream transient errors ---
+  // These are upstream network drops during streaming, NOT auth or billing failures.
+  // Using instant cooldown enables fast retry with a different account.
+  { text: "network connection lost",   cooldownMs: COOLDOWN.instant },
+  { text: "network error",             cooldownMs: COOLDOWN.instant },
+  { text: "connection reset",          cooldownMs: COOLDOWN.instant },
+  { text: "stream closed before",      cooldownMs: COOLDOWN.instant },
+  { text: "upstream request timeout",  cooldownMs: COOLDOWN.instant },
+  { text: "server_error",              cooldownMs: COOLDOWN.instant },
+  { text: "internal error",            cooldownMs: COOLDOWN.instant },
+
   // --- Text-based rules (checked first, order = priority) ---
   { text: "no credentials",           cooldownMs: COOLDOWN.long },
   { text: "request not allowed",      cooldownMs: COOLDOWN.short },
