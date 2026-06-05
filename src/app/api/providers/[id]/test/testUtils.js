@@ -625,6 +625,19 @@ async function testApiKeyConnection(connection, effectiveProxy = null) {
         }, effectiveProxy);
         return { valid: res.ok, error: res.ok ? null : "Invalid API key" };
       }
+      case "commandcode": {
+        const res = await fetchWithConnectionProxy("https://api.commandcode.ai/api/alpha/generate", {
+          method: "POST",
+          headers: { "Authorization": `Bearer ${connection.apiKey}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            threadId: "test",
+            params: { model: "deepseek/deepseek-v4-pro", messages: [{ role: "user", content: "ping" }], max_tokens: 1, stream: true },
+          }),
+        }, effectiveProxy);
+        const valid = res.status !== 401 && res.status !== 403;
+        return { valid, error: valid ? null : "Invalid API key" };
+      }
+
       default:
         return { valid: false, error: "Provider test not supported" };
     }
