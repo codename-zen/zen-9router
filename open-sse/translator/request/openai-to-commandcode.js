@@ -136,7 +136,7 @@ export function openaiToCommandCode(model, body, stream /* , credentials */) {
   const params = {
     model,
     messages,
-    stream: stream !== false,
+    stream: true, // CommandCode now requires stream:true
     max_tokens: body.max_tokens ?? body.max_output_tokens ?? 64000,
     temperature: body.temperature ?? 0.3,
   };
